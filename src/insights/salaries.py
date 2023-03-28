@@ -64,22 +64,54 @@ def matches_salary_range(job: Dict, salary: Union[int, str]) -> bool:
         raise ValueError
 
 
+def validate_salary_max_min(job, salary):
+    max = int(job["max_salary"])
+    min = int(job["min_salary"])
+    if max > min and max >= salary >= min:
+        return True
+
+    return False
+
+
+def is_not_list(job):
+    if type(job) is not list:
+        if "max_salary" not in job or "min_salary" not in job:
+            return False
+        return True
+    return False
+
+
+def validate_value_salary_range(job, salary):
+    validateSalary = is_not_list(job)
+
+    if validateSalary is True:
+        test = validate_salary_max_min(job, salary)
+        return test
+    return False
+
+
+def array_salary_range(jobs, salary):
+    data = []
+    for job in jobs:
+        validateValues = validate_value_salary_range(job, salary)
+        if validateValues is True:
+            data.append(job)
+    return data
+
+
+def other_values_salary_range(jobs, salary):
+    if type(salary) is str and salary != '':
+        return array_salary_range(jobs, int(salary))
+    return []
+
+
 def filter_by_salary_range(
     jobs: List[dict],
     salary: Union[str, int]
 ) -> List[Dict]:
-    """Filters a list of jobs by salary range
-
-    Parameters
-    ----------
-    jobs : list
-        The jobs to be filtered
-    salary : int
-        The salary to be used as filter
-
-    Returns
-    -------
-    list
-        Jobs whose salary range contains `salary`
-    """
-    raise NotImplementedError
+    try:
+        if type(salary) is int:
+            return array_salary_range(jobs, salary)
+        return other_values_salary_range(jobs, salary)
+    except ValueError:
+        raise ValueError
